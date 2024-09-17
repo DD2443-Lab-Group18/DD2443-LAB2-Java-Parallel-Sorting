@@ -33,7 +33,7 @@ public class MeasureMain {
                 // Warm-up but also check correctness.
                 System.err.println("Validating sorter");
                 if (!Auxiliary.validate(sorter, arrSize, seed, warmUps)) {
-                        System.err.printf("ERROR: Sorting error.\n");
+                        System.err.print("ERROR: Sorting error.\n");
                         System.exit(2);
                 }
                 System.err.println("Validation passed");
@@ -50,21 +50,14 @@ public class MeasureMain {
         }
 
         private static Sorter getSorter(String name, int threads) {
-                switch (name) {
-                case "Sequential":
-                        return new SequentialSort();
-                case "Thread":
-                        return new ThreadSort(threads);
-                case "ExecutorService":
-                        return new ExecutorServiceSort(threads);
-                case "ForkJoinPool":
-                        return new ForkJoinPoolSort(threads);
-                case "ParallelStream":
-                        return new ParallelStreamSort(threads);
-                case "JavaSort":
-                        return new JavaSort(threads);
-                default:
-                        return null;
-                }
+            return switch (name) {
+                case "Sequential" -> new SequentialSort();
+                case "Thread" -> new ThreadSort(threads);
+                case "ExecutorService" -> new ExecutorServiceSort(threads);
+                case "ForkJoinPool" -> new ForkJoinPoolSort(threads);
+                case "ParallelStream" -> new ParallelStreamSort(threads);
+                case "JavaSort" -> new JavaSort(threads);
+                default -> null;
+            };
         }
 }

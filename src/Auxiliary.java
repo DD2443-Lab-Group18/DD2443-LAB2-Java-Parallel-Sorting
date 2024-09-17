@@ -25,7 +25,7 @@ public class Auxiliary {
          */
         public static double[] statistics(long[] res)
         {
-                double mean = LongStream.of(res).sum() / res.length;
+                double mean = (double) LongStream.of(res).sum() / res.length;
                 double variance = LongStream.of(res)
                         .mapToDouble(v -> (v - mean) * (v - mean))
                         .sum() / (res.length - 1); 

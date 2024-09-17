@@ -1,12 +1,12 @@
 /**
  * Sort using Java's ParallelStreams and Lambda functions.
- *
+ * <p>
  * Hints:
  * - Do not take advice from StackOverflow.
  * - Think outside the box.
  *      - Stream of threads?
  *      - Stream of function invocations?
- *
+ * <p>
  * By default, the number of threads in parallel stream is limited by the
  * number of cores in the system. You can limit the number of threads used by
  * parallel streams by wrapping it in a ForkJoinPool.

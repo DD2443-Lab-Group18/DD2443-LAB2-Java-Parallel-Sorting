@@ -1,3 +1,8 @@
+/**
+ * This test class was generated with the assistance of OpenAI's ChatGPT.
+ * ChatGPT only provided test cases for this sorting algorithms.
+ */
+
 import java.util.Arrays;
 import java.util.Random;
 

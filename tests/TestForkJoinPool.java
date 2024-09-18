@@ -1,3 +1,8 @@
+/**
+ * This test class was generated with the assistance of OpenAI's ChatGPT.
+ * ChatGPT only provided test cases for this sorting algorithms.
+ */
+
 import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 

@@ -14,7 +14,7 @@ public class JavaSort implements Sorter {
                 try {
                         pool.submit(() -> Arrays.parallelSort(arr)).get(); 
                 } catch (Exception e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                 }
         }
 

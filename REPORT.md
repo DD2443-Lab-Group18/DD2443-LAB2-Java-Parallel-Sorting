@@ -1,13 +1,16 @@
-# Lab 2 - Java Parallel Programming and Sorting Algorithms
-- Group X
-- Lastname, Firstname and Lastname, Firstname
+# Lab 2 - Java Parallel Sorting Algorithms
+- Group 18
+- Wenqi Cao ~~and Simon Dussud~~
+- Our [GitHub Repo, Lab2](https://github.com/DD2443-Lab-Group18/DD2443-LAB2-Java-Parallel-Sorting) Contents
 
 ## Task 1: Sequential Sort
 We chose to implement MergeSort/QuickSort ...
 
-Source files:
+Source file:
+- `src/SequentialSort.java`
 
-- `SequentialSort.java`
+Test file:
+- `tests/TestSequential.java`
 
 ## Task 2: Amdahl's Law
 
@@ -21,25 +24,31 @@ We see that ...
 
 ## Task 3: ExecutorServiceSort
 
-Source files:
+Source file:
+- `src/ExecutorServiceSort.java`
 
-- `ExecutorServiceSort.java`
+Test file:
+- `tests/TestExecutorService.java`
 
 We decided to ...
 
 ## Task 4: ForkJoinPoolSort
 
-Source files:
+Source file:
+- `src/ForkJoinPoolSort.java`
 
-- `ForkJoinPoolSort.java`
+Test file:
+- `tests/TestForkJoinPool.java`
 
 We decided to ...
 
 ## Task 5: ParallelStreamSort
 
-Source files:
+Source file:
+- `src/ParallelStreamSort.java`
 
-- `ForkJoinPoolSort.java`
+Test file:
+- `tests/TestParallelStream.java`
 
 We decided to ...
 
@@ -50,3 +59,8 @@ We decided to sort 10,000,000 integers ...
 ![pdc plot](data/pdc.png)
 
 We see that ...
+
+## Acknowledgements
+
+The test cases for the Java sorting algorithms were generated with the assistance of OpenAI's ChatGPT.
+This tool was only used to automate the validation of the code to ensure functionalities.

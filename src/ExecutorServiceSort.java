@@ -80,6 +80,7 @@ public class ExecutorServiceSort implements Sorter {
                             Future<?> rightFuture = executor.submit(rightSortTask);
 
                             // Wait for both to complete
+                            // Otherwise, it might cause only part of the array to be sorted.
                             leftFuture.get();
                             rightFuture.get();
                         }

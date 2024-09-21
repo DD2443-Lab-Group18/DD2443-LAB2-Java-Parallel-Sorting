@@ -39,7 +39,7 @@ jobs:
       # Step 6: Run the JUnit tests
       - name: Run JUnit Tests
         run: |
-          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore tests.Sequential
-          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore tests.TestExecutorService
-          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore tests.TestForkJoinPool
-          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore tests.TestParallelStream
+          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore TestSequential
+          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore TestExecutorService
+          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore TestForkJoinPool
+          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore TestParallelStream

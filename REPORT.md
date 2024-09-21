@@ -26,6 +26,9 @@ Here is a plot of our version of Amdahl's law.
 
 > We see that it is very close to the original Amdahl's law.
 
+> We also noticed that if the array size is small, 
+> e.g., less than 1000, parallelization hardly gives any improvements on the execution time.
+
 ## Task 3: ExecutorServiceSort
 
 Source file:
@@ -61,7 +64,70 @@ Test file:
 - `tests/TestParallelStream.java`
 
 > We decided to use streams and their parallel processing capabilities. 
-> However, as quicksort involves recursive partitioning, we think it isn't inherently suited for parallel streams.
+
+> At first, we used this method to fork the parallel stream tasks. 
+> However, this method actually utilizes the ForkJoinPoll `commonPool` for parallelism.
+> 
+> ```java
+> ForkJoinTask<?> leftTask = pool.commonPool().submit(() -> {
+>     Arrays.stream(new int[]{0}).parallel()
+>           .forEach(i -> parallelQuickSort(arr, low, pivotIndex - 1));
+> });
+> ```
+
+> Then we modify the method as follows.
+> However, the code is still not an effective way to parallelize the quicksort algorithm. 
+> `Arrays.stream(new int[] {0})` creates a stream from an array with just a single element, `0`. 
+> 
+> This doesn't result in any real parallelism, as the stream contains only one element. 
+> Thereby, `forEach()` executes the lambda expression just once, as there's only one element to process in the stream.
+> 
+> ```java
+> Arrays.stream(new int[]{0}).parallel()
+>       .forEach(i -> parallelQuickSort(arr, low, pivotIndex - 1));
+> 
+> ```
+
+> After that, we changed the code as follows.
+> 
+> ```java
+> // Parallelize the two recursive calls with streams
+> Arrays.stream(new int[] {0, 1}).parallel()
+>       .forEach(i -> {
+>                   if (i == 0) {
+>                       parallelQuickSort(arr, low, pivotIndex - 1);
+>                   } else {
+>                       parallelQuickSort(arr, pivotIndex + 1, high);
+>                   }
+>       });
+> 
+> ```
+> 
+> `.parallel()` converts the stream into a parallel stream. 
+> It allows the subsequent operations to be performed concurrently if the system resources permit.
+> 
+> `.forEach(...)` is a terminal operation that performs an action for each element in the stream.
+> In this case, it's used to execute our sorting logic.
+>
+> Inside the lambda function:
+> - If i is 0, it calls parallelQuickSort on the left partition (low to pivotIndex - 1).
+> - If i is 1, it calls parallelQuickSort on the right partition (pivotIndex + 1 to high).
+
+> Finally, we wrap it back in a ForkJoinPool to limit the number of used threads.
+>
+> ```java
+> // Parallelize the two recursive calls with streams
+> pool.submit(() -> {
+>     Arrays.stream(new int[] {0, 1}).parallel().forEach(i -> {
+>         if (i == 0) {
+>             parallelQuickSort(arr, low, pivotIndex - 1);
+>         } else {
+>             parallelQuickSort(arr, pivotIndex + 1, high);
+>         }
+>     });
+> }).get();
+> 
+> ```
 
 ## Task 6: Performance measurements with PDC
 

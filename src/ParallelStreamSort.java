@@ -62,13 +62,15 @@ public class ParallelStreamSort implements Sorter {
 
                 try {
                     // Parallelize the two recursive calls with streams
-                    Arrays.stream(new int[] {0, 1}).parallel().forEach(i -> {
-                        if (i == 0) {
-                            parallelQuickSort(arr, low, pivotIndex - 1);
-                        } else {
-                            parallelQuickSort(arr, pivotIndex + 1, high);
-                        }
-                    });
+                    pool.submit(() -> {
+                        Arrays.stream(new int[] {0, 1}).parallel().forEach(i -> {
+                            if (i == 0) {
+                                parallelQuickSort(arr, low, pivotIndex - 1);
+                            } else {
+                                parallelQuickSort(arr, pivotIndex + 1, high);
+                            }
+                        });
+                    }).get();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

@@ -43,3 +43,4 @@ jobs:
           java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore TestExecutorService
           java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore TestForkJoinPool
           java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore TestParallelStream
+          java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore TestThread

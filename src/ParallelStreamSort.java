@@ -36,23 +36,22 @@ import java.util.concurrent.ForkJoinTask;
 public class ParallelStreamSort implements Sorter {
 
         public final int threads;
+        private final ForkJoinPool pool;
 
         public ParallelStreamSort(int threads) {
-                this.threads = threads;
+            // Create a ForkJoinPool with the specified number of threads in Constructor!
+            this.pool = new ForkJoinPool(threads);
+            this.threads = threads;
         }
 
         @Override
         public void sort(int[] arr) {
-            // Create a ForkJoinPool with the specified number of threads
-            ForkJoinPool pool = new ForkJoinPool(threads);
             try {
                 pool.submit(() -> {
                     parallelQuickSort(arr, 0, arr.length - 1);
-                }).get();
+                }).get(); // Manage threads with ForkJoinPool
             } catch (Exception e) {
                 throw new RuntimeException(e);
-            } finally {
-                pool.shutdown();
             }
         }
 
@@ -64,12 +63,12 @@ public class ParallelStreamSort implements Sorter {
 
                 try {
                     // Parallelize the two recursive calls with streams
-                    ForkJoinTask<?> leftTask = ForkJoinPool.commonPool().submit(() -> {
+                    ForkJoinTask<?> leftTask = pool.submit(() -> {
                         Arrays.stream(new int[]{0}).parallel()
-                                .forEach(i -> parallelQuickSort(arr, low, pivotIndex - 1));
+                              .forEach(i -> parallelQuickSort(arr, low, pivotIndex - 1));
                     });
 
-                    ForkJoinTask<?> rightTask = ForkJoinPool.commonPool().submit(() -> {
+                    ForkJoinTask<?> rightTask = pool.submit(() -> {
                         Arrays.stream(new int[] {0}).parallel()
                               .forEach(i -> parallelQuickSort(arr, pivotIndex + 1, high));
                     });

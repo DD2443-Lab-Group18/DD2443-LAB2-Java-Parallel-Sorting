@@ -13,15 +13,15 @@ import java.util.concurrent.*;
 public class ExecutorServiceSort implements Sorter {
 
         public final int threads;
-        private ExecutorService executor;
+        private final ExecutorService executor;
 
         public ExecutorServiceSort(int threads) {
+                // Create a thread pool with the specified number of threads in Constructor!
                 this.threads = threads;
+                this.executor = Executors.newFixedThreadPool(threads);
         }
 
         public void sort(int[] arr) {
-                // Create a thread pool with the specified number of threads
-                executor = Executors.newFixedThreadPool(threads);
                 try {
                         myQuickSort(arr, 0, arr.length - 1);
                 } finally {
@@ -42,7 +42,7 @@ public class ExecutorServiceSort implements Sorter {
         private void myQuickSort(int[] array, int low, int high) {
             if (low < high) {
                 // Switch to Sequential Sort for small arrays
-                int THRESHOLD = 8;
+                int THRESHOLD = 16;
                 if (high - low + 1 <= THRESHOLD) {
                     SequentialSort.quickSort(array, low, high);
                 }

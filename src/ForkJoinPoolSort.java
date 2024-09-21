@@ -8,20 +8,18 @@ import java.util.concurrent.RecursiveAction;
 public class ForkJoinPoolSort implements Sorter {
 
         public final int threads;
+        private final ForkJoinPool pool;
+        private static final int THRESHOLD = 8;
 
         public ForkJoinPoolSort(int threads) {
+                // Create a ForkJoinPool with the specified number of threads in Constructor!
                 this.threads = threads;
+                this.pool = new ForkJoinPool(threads);
         }
 
         public void sort(int[] arr) {
-                // Create a ForkJoinPool with the specified number of threads
-                ForkJoinPool pool = new ForkJoinPool(threads);
-                try {
-                        // Submitting the first task to the ForkJoinPool
-                        pool.invoke(new Worker(arr, 0, arr.length - 1));
-                } finally {
-                        pool.shutdown();
-                }
+                // Submitting the first task to the ForkJoinPool
+                pool.invoke(new Worker(arr, 0, arr.length - 1));
         }
 
         public int getThreads() {
@@ -32,7 +30,6 @@ public class ForkJoinPoolSort implements Sorter {
             private final int low;
             private final int high;
             private final int[] array;
-            private static final int THRESHOLD = 8;
 
             public Worker(int[] array, int low, int high) {
                 this.array = array;

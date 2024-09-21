@@ -38,4 +38,5 @@ jobs:
 
       # Step 6: Run the JUnit tests
       - name: Run JUnit Tests
-        run: java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore tests/*.java
+        # JUnit expects to run the tests from compiled .class files, not the .java files
+        run: java -cp out:junit.jar:hamcrest.jar org.junit.runner.JUnitCore tests.*

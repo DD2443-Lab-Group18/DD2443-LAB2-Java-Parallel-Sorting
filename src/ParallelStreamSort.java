@@ -16,7 +16,6 @@
 
 import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 
 /**
  * Parallel Stream: A parallel stream splits its elements into multiple chunks,
@@ -63,20 +62,13 @@ public class ParallelStreamSort implements Sorter {
 
                 try {
                     // Parallelize the two recursive calls with streams
-                    ForkJoinTask<?> leftTask = pool.submit(() -> {
-                        Arrays.stream(new int[]{0}).parallel()
-                              .forEach(i -> parallelQuickSort(arr, low, pivotIndex - 1));
+                    Arrays.stream(new int[] {0, 1}).parallel().forEach(i -> {
+                        if (i == 0) {
+                            parallelQuickSort(arr, low, pivotIndex - 1);
+                        } else {
+                            parallelQuickSort(arr, pivotIndex + 1, high);
+                        }
                     });
-
-                    ForkJoinTask<?> rightTask = pool.submit(() -> {
-                        Arrays.stream(new int[] {0}).parallel()
-                              .forEach(i -> parallelQuickSort(arr, pivotIndex + 1, high));
-                    });
-
-                    // Wait for both to complete
-                    leftTask.get();
-                    rightTask.get();
-
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

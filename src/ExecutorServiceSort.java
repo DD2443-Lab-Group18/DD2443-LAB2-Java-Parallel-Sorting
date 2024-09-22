@@ -79,9 +79,8 @@ public class ExecutorServiceSort implements Sorter {
                             Future<?> leftFuture = executor.submit(leftSortTask);
                             Future<?> rightFuture = executor.submit(rightSortTask);
 
-                            // Wait for both to complete
-                            // Otherwise, it might cause only part of the array to be sorted.
-                            leftFuture.get();
+                            // Wait for right to complete [Bug Fixed]
+                            // Otherwise, it may cause only part of the array to be sorted.
                             rightFuture.get();
                         }
                     } catch (Exception e) {

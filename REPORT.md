@@ -136,9 +136,13 @@ Test file:
 
 > We decided to sort 10,000,000 integers.
 
-![pdc plot](data/pdc.png)
+Source file:
+- `plots/MyPDCCode.java` (Run on PDC)
+- `plots/MyPDCPlot.java` (Run Locally)
 
-> We see that the `ForkJoinPoolSort` show slightly better performance with larger thread counts due to more efficient parallelism.
+![pdc plot](data/my_pdc.png)
+
+> We see that the `ForkJoinPoolSort` show better performance with larger thread counts due to more efficient parallelism.
 > These results show the importance of balancing parallelism with overhead and optimizing thread utilization 
 > to achieve effective performance gains.
 

@@ -18,16 +18,19 @@ Test file:
 > Our Amdahl's law is $S=\frac{1}{(1−P)+\frac{P\cdot{}E(N)}{N}}$, where $E(N)$ is the parallel efficiency.
 > The parallel efficiency is a function of N, but it is also affected by the computational power of the hardware.
 
-> For simplicity, we assume that E(N) is $N^{8/9}$ in plotting.
+> For simplicity, we assume that E(N) is $N^{1/9}$ in plotting for N < 512.
+
+Source file:
+- `plots/MyAmdahlPlot.java`
 
 Here is a plot of our version of Amdahl's law.
 
-![amdahl's law plot](data/amdahl.png)
+![amdahl's law plot](data/my_amdahl.png)
 
 > We see that it is very close to the original Amdahl's law.
 
 > We also noticed that if the array size is small, 
-> e.g., less than 1000, parallelization hardly gives any improvements on the execution time.
+> e.g., less than 100, parallelization hardly gives any improvements on the execution time.
 
 ## Task 3: ExecutorServiceSort
 
@@ -138,6 +141,23 @@ Test file:
 > We see that the `ForkJoinPoolSort` show slightly better performance with larger thread counts due to more efficient parallelism.
 > These results show the importance of balancing parallelism with overhead and optimizing thread utilization 
 > to achieve effective performance gains.
+
+## Task 7: ThreadSort
+
+Source file:
+- `src/ThreadSort.java`
+
+Test file:
+- `tests/ThreadSort.java`
+
+> We utilize `start()` and `join()` from Java's Threads to achieve parallelism, and 
+> keep track of the num of active threads using the `AtomicInteger` type.
+
+## Overall Comments & Discussion
+
+> All sorting implmemtations here use recursive calls for parallelism. However, massive recursive calls 
+> may lead to stack overflow problem if array size goes beyond certain level. While non-recursive sort 
+> is a solution, achieving parallelism here is not an easy topic.
 
 ## Acknowledgements
 

@@ -22,14 +22,34 @@ public class MyPDCCode {
 
         // Measure ForkJoinPool Sort with different thread counts
         for (int threads : threadCounts) {
-            ForkJoinPoolSort parallelSort = new ForkJoinPoolSort(threads);
-            long[] parallelTime = Auxiliary.measure(parallelSort, arraySize, 6, 100);
-            double pMean = (double) LongStream.of(parallelTime).sum() / parallelTime.length;
-            System.out.println(threads + " threads, ForkJoinPool sort time: " + pMean + " ns");
+            ExecutorServiceSort executorServiceSort = new ExecutorServiceSort(threads);
+            ParallelStreamSort parallelStreamSort = new ParallelStreamSort(threads);
+            ForkJoinPoolSort forkJoinPoolSort = new ForkJoinPoolSort(threads);
+            ThreadSort parallelThreadSort = new ThreadSort(threads);
+            JavaSort parallelJavaSort = new JavaSort(threads);
 
-            // Calculate speedup
-            double speedup = sMean / pMean;
-            System.out.println("Speedup with " + threads + " threads: " + speedup);
+            measurePerformance(executorServiceSort, "ExecutorServiceSort",
+                    sMean, arraySize, threads);
+            measurePerformance(parallelStreamSort, "ParallelStreamSort",
+                    sMean, arraySize, threads);
+            measurePerformance(forkJoinPoolSort, "ForkJoinPoolSort",
+                    sMean, arraySize, threads);
+            measurePerformance(parallelThreadSort, "ThreadSort",
+                    sMean, arraySize, threads);
+            measurePerformance(parallelJavaSort, "JavaSort",
+                    sMean, arraySize, threads);
         }
+    }
+
+    private static void measurePerformance(Sorter sorter, String name,
+                                           double seqMean, int arrSize, int threads) {
+        // Measure parallel execution time
+        long[] parallelTime = Auxiliary.measure(sorter, arrSize, 6, 100);
+        double pMean = (double) LongStream.of(parallelTime).sum() / parallelTime.length;
+        System.out.println(threads + " threads, " + name + " sort time: " + pMean + " ns");
+
+        // Calculate speedup
+        double speedup = seqMean / pMean;
+        System.out.println("Speedup with " + threads + " threads: " + speedup);
     }
 }

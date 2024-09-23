@@ -3,6 +3,7 @@
  */
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * ExecutorService provides a powerful and flexible way to manage and execute tasks
@@ -12,18 +13,21 @@ import java.util.concurrent.*;
 
 public class ExecutorServiceSort implements Sorter {
 
-        public final int threads;
-        private final ExecutorService executor;
+        private final int threads;
+        private final static int THRESHOLD = 16;
+        private final AtomicInteger activeThreads;
 
         public ExecutorServiceSort(int threads) {
                 // Create a thread pool with the specified number of threads in Constructor!
                 this.threads = threads;
-                this.executor = Executors.newFixedThreadPool(threads);
+                // Apply an atomic integer to count the active threads
+                this.activeThreads = new AtomicInteger(0);
         }
 
         public void sort(int[] arr) {
+                ExecutorService executor = Executors.newFixedThreadPool(threads);
                 try {
-                        myQuickSort(arr, 0, arr.length - 1);
+                        myQuickSort(arr, 0, arr.length - 1, executor);
                 } finally {
                         executor.shutdown();
                 }
@@ -33,34 +37,35 @@ public class ExecutorServiceSort implements Sorter {
                 return threads;
         }
 
-        private boolean hasAvailableThreads() {
-            // Check if there are available threads in the pool
-            ThreadPoolExecutor TPExecutor = (ThreadPoolExecutor) executor;
-            return TPExecutor.getActiveCount() < threads;
-        }
-
-        private void myQuickSort(int[] array, int low, int high) {
+        private void myQuickSort(int[] array, int low, int high, ExecutorService executor) {
             if (low < high) {
                 // Switch to Sequential Sort for small arrays
-                int THRESHOLD = 16;
-                if (high - low + 1 <= THRESHOLD) {
+                if (high - low < THRESHOLD) {
                     SequentialSort.quickSort(array, low, high);
                 }
 
                 else {
                     int pivot = SequentialSort.partition(array, low, high);
 
-                    Callable<Void> leftSortTask = () -> {
-                        myQuickSort(array, low, pivot - 1);
-                        return null;
-                    };
+                    if (activeThreads.get() < threads) {
+                        activeThreads.incrementAndGet();
+                        // Submit tasks to the executor service
+                        Future<?> leftTask = executor.submit(() -> {
+                            myQuickSort(array, low, pivot - 1, executor);
+                            activeThreads.decrementAndGet();
+                        });
 
-                    Callable<Void> rightSortTask = () -> {
-                        myQuickSort(array, pivot + 1, high);
-                        return null;
-                    };
+                        // Only parallel left branches to reduce contention and overheads
+                        myQuickSort(array, pivot + 1, high, executor);
 
-                    try {
+                        try {
+                            // Wait for the task to complete [Bug Fixed]
+                            // Otherwise, it may cause part of the array unsorted.
+                            leftTask.get();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
                         // Run the tasks directly if threads are not available
                         /* Otherwise If the tasks recursively submit more child tasks and
                            there aren't enough threads to execute them, it can lead to the
@@ -70,21 +75,8 @@ public class ExecutorServiceSort implements Sorter {
                            BUG: Child tasks would never be scheduled to run because there
                            would be no available worker threads.
                         */
-                        if (executor.isShutdown() || !hasAvailableThreads()) {
-                            // Run tasks directly in current thread
-                            leftSortTask.call();
-                            rightSortTask.call();
-                        } else {
-                            // Otherwise, submit tasks to the executor service
-                            Future<?> leftFuture = executor.submit(leftSortTask);
-                            Future<?> rightFuture = executor.submit(rightSortTask);
-
-                            // Wait for right to complete [Bug Fixed]
-                            // Otherwise, it may cause only part of the array to be sorted.
-                            rightFuture.get();
-                        }
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        SequentialSort.quickSort(array, low, pivot - 1);
+                        SequentialSort.quickSort(array, pivot + 1, high);
                     }
                 }
             }

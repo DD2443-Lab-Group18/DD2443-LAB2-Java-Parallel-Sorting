@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThreadSort implements Sorter {
         private final int threads;
         private final AtomicInteger activeThreads; // Thread-safe int, so no need for lock().
-        private static final int THRESHOLD = 1000;
+        private static final int THRESHOLD = 128;
 
         public ThreadSort(int threads) {
             this.threads = threads;
@@ -48,13 +48,13 @@ public class ThreadSort implements Sorter {
                 if (activeThreads.get() < threads) {
                     leftThread = startNewThread(arr, low, pivotIndex - 1);
                 } else {
-                    parallelQuickSort(arr, low, pivotIndex - 1);
+                    SequentialSort.quickSort(arr, low, pivotIndex - 1);
                 }
 
                 if (activeThreads.get() < threads) {
                     rightThread = startNewThread(arr, pivotIndex + 1, high);
                 } else {
-                    parallelQuickSort(arr, pivotIndex + 1, high);
+                    SequentialSort.quickSort(arr, pivotIndex + 1, high);
                 }
 
                 try {
@@ -72,21 +72,5 @@ public class ThreadSort implements Sorter {
 
         public int getThreads() {
             return threads;
-        }
-
-        private class Worker implements Runnable {
-            private final int low;
-            private final int high;
-            private final int[] arr;
-
-            public Worker(int[] arr, int low, int high) {
-                this.arr = arr;
-                this.low = low;
-                this.high = high;
-            }
-
-            public void run() {
-                parallelQuickSort(arr, low, high);
-            }
         }
 }

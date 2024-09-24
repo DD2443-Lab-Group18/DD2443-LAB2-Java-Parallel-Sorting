@@ -7,11 +7,11 @@ public class MyPDCPlot {
     public static void main(String[] args) {
 
         double[] threadCounts = {2, 4, 8, 16, 32, 48, 64, 96};
-        double[] speedupsES = {1.07, 1.11, 1.24, 1.42, 1.41, 1.30, 1.41, 1.23};
-        double[] speedupsPS = {0.82, 1.62, 2.75, 3.24, 4.19, 4.54, 4.70, 4.35};
-        double[] speedupsFS = {1.45, 2.69, 4.06, 4.34, 5.05, 5.20, 5.28, 5.20};
-        double[] speedupsTS = {0.84, 1.00, 1.26, 1.32, 1.36, 1.34, 1.20, 1.02};
-        double[] speedupsJS = {0.96, 2.60, 3.69, 7.62, 14.4, 18.1, 20.5, 22.9};
+        double[] speedupsES = {0.93, 1.02, 1.24, 1.63, 1.92, 2.00, 1.81, 1.96};
+        double[] speedupsPS = {0.94, 1.70, 3.04, 3.34, 4.11, 4.64, 4.23, 4.08};
+        double[] speedupsFS = {1.49, 2.87, 4.62, 4.78, 5.51, 5.56, 5.28, 5.19};
+        double[] speedupsTS = {0.80, 0.91, 1.10, 1.38, 1.52, 1.48, 1.47, 1.41};
+        double[] speedupsJS = {0.90, 2.39, 4.37, 8.88, 16.9, 19.8, 24.0, 25.2};
 
         XYChart chart = new XYChartBuilder().width(800)
                 .title("Speedup with Different Implementations")

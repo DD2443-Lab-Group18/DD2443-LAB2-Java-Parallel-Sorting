@@ -51,6 +51,8 @@ Test file:
 > to minimize contention and reduce the overhead associated with parallelizing both subtasks. 
 > As a result, the performance is improved by roughly 30%.
 
+> NOTICE: The current ver. of ExecutorServiceSort has race conditions as mentioned in Task 7!
+
 ## Task 4: ForkJoinPoolSort
 
 Source file:
@@ -120,22 +122,6 @@ Test file:
 > - If i is 0, it calls parallelQuickSort on the left partition (low to pivotIndex - 1).
 > - If i is 1, it calls parallelQuickSort on the right partition (pivotIndex + 1 to high).
 
-> Finally, we wrap it back in a ForkJoinPool to limit the number of used threads.
->
-> ```java
-> // Parallelize the two recursive calls with streams
-> pool.submit(() -> {
->     Arrays.stream(new int[] {0, 1}).parallel().forEach(i -> {
->         if (i == 0) {
->             parallelQuickSort(arr, low, pivotIndex - 1);
->         } else {
->             parallelQuickSort(arr, pivotIndex + 1, high);
->         }
->     });
-> }).get();
-> 
-> ```
-
 ## Task 6: Performance measurements with PDC
 
 > We decided to sort 10,000,000 integers.
@@ -160,6 +146,33 @@ Test file:
 
 > We utilize `start()` and `join()` from Java's Threads to achieve parallelism, and 
 > keep track of the num of active threads using the `AtomicInteger` type.
+
+> At first, we use both `atomicInteger.get()` and `atomicInteger.incrementAndGet()` calls. 
+> 
+> However, separating the `get()` and `incrementAndGet()` calls can lead to a race condition, 
+> where multiple threads may read the same value of activeThreads before any updates are made.
+>
+> ```java
+> 
+> 
+> 
+> ```
+> 
+> Although both `get()` and `incrementAndGet()` are atomic individually,
+> when used separately, the overall process is NOT atomic.
+
+> Finally, we changed the code as follows using `compareAndSet()`. 
+>
+> ```java
+> 
+> 
+> 
+> ```
+> 
+> Another valid method to ensure the process atomic is using a lock (e.g., `ReentrantLock` in Java) yourself. 
+> 
+> While `AtomicInteger` provides non-blocking operations for atomic updates, using a `lock` allows you 
+> to explicitly define a critical section, making the operations within that section mutually exclusive.
 
 ## Overall Comments & Discussion
 

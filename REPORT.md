@@ -153,26 +153,86 @@ Test file:
 > where multiple threads may read the same value of activeThreads before any updates are made.
 >
 > ```java
-> 
-> 
-> 
+> private Thread startNewThread(int[] arr, int low, int high) {
+>     Thread thread = new Thread(() -> {
+>         activeThreads.incrementAndGet();
+>         try {
+>             parallelQuickSort(arr, low, high);
+>         } finally {
+>             activeThreads.decrementAndGet();
+>         }
+>     });
+>     thread.start();
+>     return thread;
+> }
 > ```
 > 
 > Although both `get()` and `incrementAndGet()` are atomic individually,
 > when used separately, the overall process is NOT atomic.
 
-> Finally, we changed the code as follows using `compareAndSet()`. 
+> Later, we changed the code as follows using `compareAndSet()`. 
 >
 > ```java
-> 
-> 
-> 
+> private Thread startNewThread(int[] arr, int low, int high) {
+>     while (true) {
+>         // Create a snapshot for the current thread number
+>         int current = activeThreads.get();
+>         // Cannot increment as we reached the limit
+>         if (current >= threads) {
+>             return null;
+>         // Try to atomically increment the thread count
+>         if (activeThreads.compareAndSet(current, current + 1)) {
+>             Thread thread = new Thread(() -> {
+>             try {
+>                 parallelQuickSort(arr, low, high);
+>             } finally {
+>                 activeThreads.decrementAndGet();
+>             }
+>         });
+>         thread.start();
+>         return thread;
+>         }
+>         // If compareAndSet fails, the thread count has changed, retry the loop
+>     }
+> }
+> ```
+>
+> This implementation is correct. However, the approach of using a `while(true)` loop with `compareAndSet()`, 
+> known as a spinlock, could potentially consume more CPU resources if many threads are actively spinning in the loop 
+> and retrying the operation when contention is high.
+
+> Another valid method to ensure the process atomic is using a lock (e.g., `ReentrantLock` in Java).
+>
+> ```java
+> private Thread startNewThread(int[] arr, int low, int high) {
+>    this.lock.lock();
+>    if (this.activeThreads >= this.threads) {
+>        this.lock.unlock();
+>        SequentialSort.quickSort(arr, low, high);
+>    }
+>    else {
+>        this.activeThreads++;
+>        this.lock.unlock();
+>        Thread thread = new Thread(() -> {
+>            try {
+>                parallelQuickSort(arr, low, high);
+>            } finally {
+>                this.lock.lock();
+>                this.activeThreads--;
+>                this.lock.unlock();
+>            }
+>        });
+>        thread.start();
+>        return thread;
+>     }
+>     return null;
+> }
 > ```
 > 
-> Another valid method to ensure the process atomic is using a lock (e.g., `ReentrantLock` in Java) yourself. 
-> 
-> While `AtomicInteger` provides non-blocking operations for atomic updates, using a `lock` allows you 
-> to explicitly define a critical section, making the operations within that section mutually exclusive.
+> While `AtomicInteger` provides non-blocking atomic updates, using a lock allows for fine-grained control and
+> explicitly defines critical sections, making operations within those sections mutually exclusive.
+
+> We used this version as our final one (Note: the plotting uses version 1.0).
 
 ## Overall Comments & Discussion
 
